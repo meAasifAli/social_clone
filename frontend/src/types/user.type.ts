@@ -13,4 +13,9 @@ export interface User {
   followersCount: number;
   followingCount: number;
   isFollowing?: boolean;
+  bio?: string;
+  fullName?: string;
+  website?: string;
+  avatar?: string;
+  mutualFollowersCount?: number;
 }

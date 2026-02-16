@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
+import { PostModule } from './post/post.module';
+import { NotificationModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -21,10 +23,15 @@ import { UserModule } from './user/user.module';
         database: config.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: process.env.NODE_ENV === 'development',
+        // ssl: {
+        //   rejectUnauthorized: false,
+        // },
       }),
     }),
     AuthModule,
+    NotificationModule,
     UserModule,
+    PostModule,
   ],
   controllers: [],
   providers: [],

@@ -17,10 +17,15 @@ import Settings from "./pages/dashboard/settings";
 import { PublicRoute } from "./pages/general/public-route";
 import { ProtectedRoute } from "./pages/general/protected-route";
 import GoogleSuccess from "./pages/auth/google-success";
+import Post from "./pages/dashboard/post";
+import NotFound from "./pages/not-found";
+import Home from "./pages";
 
 const App = () => {
   return (
     <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="*" element={<NotFound />} />
       <Route path="/auth/google-success" element={<GoogleSuccess />} />
       <Route path="reset-password" element={<ResetPassword />} />
       {/* PUBLIC AUTH ROUTES */}
@@ -37,7 +42,8 @@ const App = () => {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route path="feed" element={<Feed />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path="post/:postId" element={<Post />} />
+          <Route path="profile/:userId" element={<Profile />} />
           <Route path="create" element={<CreatePosts />} />
           <Route path="search" element={<Search />} />
           <Route path="activity" element={<Activity />} />

@@ -24,6 +24,9 @@ export class Post {
   @Column({ nullable: true })
   image?: string;
 
+  @Column({ nullable: true, length: 7 }) // Hex color code like #FF5733
+  backgroundColor?: string;
+
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   author: User;
 

@@ -7,10 +7,9 @@ import {
   DeleteDateColumn,
   Index,
   BeforeInsert,
-  OneToOne,
   OneToMany,
 } from 'typeorm';
-import { UserProfile } from './user-profile.entity';
+
 import { RefreshToken } from './refresh-token.entity';
 import { Follow } from './follow.entity';
 
@@ -70,9 +69,30 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   emailOtpExpires: Date;
 
+  // inside User entity
+
+  @Column({ nullable: true })
+  fullName?: string;
+
+  @Column({ nullable: true })
+  bio?: string;
+
+  @Column({ nullable: true })
+  avatar?: string;
+
+  @Column({ nullable: true })
+  coverImage?: string;
+
+  @Column({ nullable: true })
+  location?: string;
+
+  @Column({ nullable: true })
+  website?: string;
+
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth?: Date;
+
   /* ---------- Relations ---------- */
-  @OneToOne(() => UserProfile, (p) => p.user, { cascade: true })
-  profile: UserProfile;
 
   @OneToMany(() => RefreshToken, (rt) => rt.user)
   refreshTokens: RefreshToken[];

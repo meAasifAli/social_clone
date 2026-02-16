@@ -47,8 +47,10 @@ export class AuthService {
       password: hash,
       isEmailVerified: false,
       emailOtp: otp,
-      emailOtpExpires: new Date(Date.now() + 1000 * 60 * 10), // 10 min
-      profile: { fullName: dto.fullName },
+      emailOtpExpires: new Date(Date.now() + 1000 * 60 * 10),
+
+      // moved into user table now
+      fullName: dto.fullName,
     });
 
     await this.userRepo.save(user);
@@ -121,21 +123,42 @@ export class AuthService {
     const email = profile.emails?.[0]?.value;
     if (!email) throw new BadRequestException('No email from Google');
 
+    const googleAvatar = profile.photos?.[0]?.value || null;
+    const googleFullName = profile.displayName || null;
+
     let user = await this.userRepo.findOne({ where: { email } });
 
+    // ============================
+    // NEW USER
+    // ============================
     if (!user) {
       user = this.userRepo.create({
         email,
         googleId: profile.id,
         provider: 'google',
         isEmailVerified: true,
-        profile: {
-          fullName: profile.displayName,
-          avatar: profile.photos?.[0]?.value,
-        },
+
+        // moved into users table now
+        fullName: googleFullName || undefined,
+        avatar: googleAvatar || undefined,
       });
+
       await this.userRepo.save(user);
+      return this.createSession(user, userAgent, ip);
     }
+
+    // ============================
+    // EXISTING USER
+    // ============================
+    if (!user.googleId) user.googleId = profile.id;
+    user.provider = 'google';
+    user.isEmailVerified = true;
+
+    // only fill if empty (don’t overwrite user-edited profile)
+    if (!user.fullName && googleFullName) user.fullName = googleFullName;
+    if (!user.avatar && googleAvatar) user.avatar = googleAvatar;
+
+    await this.userRepo.save(user);
 
     return this.createSession(user, userAgent, ip);
   }
@@ -166,7 +189,7 @@ export class AuthService {
 
   async forgotPassword(email: string) {
     const user = await this.userRepo.findOne({ where: { email } });
-    if (!user) return { success: true }; // prevent enumeration
+    if (!user) return { success: true };
 
     const token = randomUUID();
 
@@ -221,7 +244,6 @@ export class AuthService {
     const payload: JwtPayload = { sub: user.id, email: user.email };
 
     const accessToken = this.jwtService.sign(payload);
-
     const refreshToken = randomUUID();
 
     await this.refreshRepo.save({

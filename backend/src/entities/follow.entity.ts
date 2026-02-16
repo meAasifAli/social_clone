@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Unique,
   Index,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -17,9 +18,11 @@ export class Follow {
   id: string;
 
   @ManyToOne(() => User, (u) => u.following, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'followerId' }) // Explicitly set column name
   follower: User;
 
   @ManyToOne(() => User, (u) => u.followers, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'followingId' }) // Explicitly set column name
   following: User;
 
   @CreateDateColumn()

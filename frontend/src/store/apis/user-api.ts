@@ -1,62 +1,55 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { RootState } from "../index";
+import { baseApi } from "./base-api";
 import type { User } from "@/types/user.type";
 
-export const userApi = createApi({
-  reducerPath: "userApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${import.meta.env.VITE_API_URL}/api/v1`,
-    credentials: "include",
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.accessToken;
-      if (token) headers.set("authorization", `Bearer ${token}`);
-      return headers;
-    },
-  }),
-  tagTypes: ["User", "Follow"],
+export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    /* =============================
-       GET USER BY ID
-    ============================= */
     getUserById: builder.query<User, string>({
       query: (id) => `/users/${id}`,
-      providesTags: (_r, _e, id) => [{ type: "User", id }],
+      providesTags: (_r, _e, id) => [
+        { type: "User", id },
+        { type: "User", id: "ME" },
+      ],
     }),
 
-    /* =============================
-       UPDATE PROFILE
-    ============================= */
     updateProfile: builder.mutation<User, FormData>({
       query: (body) => ({
         url: "/users/me",
         method: "PATCH",
         body,
       }),
-      invalidatesTags: ["User"],
+      invalidatesTags: [{ type: "User", id: "ME" }],
     }),
 
-    /* =============================
-       FOLLOW
-    ============================= */
     followUser: builder.mutation<{ success: true }, string>({
       query: (userId) => ({
-        url: `/users/${userId}/follow`,
+        url: `/users/follow`,
         method: "POST",
+        body: { userId },
       }),
-      invalidatesTags: (_r, _e, id) => [{ type: "User", id }],
+      invalidatesTags: (_r, _e, userId) => [
+        { type: "User", id: userId },
+        { type: "User", id: "ME" },
+      ],
     }),
 
-    /* =============================
-       UNFOLLOW
-    ============================= */
     unfollowUser: builder.mutation<{ success: true }, string>({
       query: (userId) => ({
-        url: `/users/${userId}/unfollow`,
-        method: "DELETE",
+        url: `/users/unfollow`,
+        method: "POST",
+        body: { userId },
       }),
-      invalidatesTags: (_r, _e, id) => [{ type: "User", id }],
+      invalidatesTags: (_r, _e, userId) => [
+        { type: "User", id: userId },
+        { type: "User", id: "ME" },
+      ],
+    }),
+    getSuggestions: builder.query<User[], void>({
+      query: () => `/users/suggestions`,
+      providesTags: [{ type: "User", id: "SUGGESTIONS" }],
     }),
   }),
+
+  overrideExisting: false,
 });
 
 export const {
@@ -64,4 +57,5 @@ export const {
   useUpdateProfileMutation,
   useFollowUserMutation,
   useUnfollowUserMutation,
+  useGetSuggestionsQuery,
 } = userApi;

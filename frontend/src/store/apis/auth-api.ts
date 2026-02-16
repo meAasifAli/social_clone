@@ -23,23 +23,26 @@ export const authApi = baseApi.injectEndpoints({
       },
     }),
 
+    // ✅ refresh uses cookie, no body
     refresh: builder.mutation({
-      query: (data) => ({
+      query: () => ({
         url: "/auth/refresh",
         method: "POST",
-        body: data,
       }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        const { data } = await queryFulfilled;
-        dispatch(setCredentials(data));
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setCredentials(data));
+        } catch {
+          dispatch(logout());
+        }
       },
     }),
 
     logout: builder.mutation({
-      query: (data) => ({
+      query: () => ({
         url: "/auth/logout",
         method: "POST",
-        body: data,
       }),
       async onQueryStarted(_, { dispatch }) {
         dispatch(logout());

@@ -8,23 +8,23 @@ import {
   HttpCode,
   Res,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
+import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+
+import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Profile } from 'passport-google-oauth20';
 import { VerifyDto } from './dto/verify-otp.dto';
+
+import { JwtRequest } from '../types/jwt-request.type';
+import { GoogleRequest } from '../types/google-request.type';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(
-    @Body()
-    body: RegisterDto,
-  ) {
+  async register(@Body() body: RegisterDto) {
     return this.authService.register(body);
   }
 
@@ -50,11 +50,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  async login(
-    @Body()
-    body: LoginDto,
-    @Req() req: Request,
-  ) {
+  async login(@Body() body: LoginDto, @Req() req: JwtRequest) {
     return this.authService.login(
       body,
       req.headers['user-agent'] || 'unknown',
@@ -62,6 +58,7 @@ export class AuthController {
     );
   }
 
+  // Google OAuth
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {
@@ -70,15 +67,21 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleCallback(
-    @Req() req: Request & { user: Profile },
-    @Res() res: Response,
-  ) {
+  async googleCallback(@Req() req: GoogleRequest, @Res() res: Response) {
     const data = await this.authService.googleLogin(
       req.user,
       req.headers['user-agent'] || 'unknown',
       req.ip || '0.0.0.0',
     );
+
+    // ✅ store refreshToken in HttpOnly cookie
+    res.cookie('refreshToken', data.refreshToken, {
+      httpOnly: true,
+      secure: false, // true in production https
+      sameSite: 'lax',
+      path: '/api/v1/auth/refresh',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
 
     const redirectUrl =
       `http://localhost:5173/auth/google-success` +
@@ -89,7 +92,10 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body() body: { refreshToken: string }, @Req() req: Request) {
+  async refresh(
+    @Body() body: { refreshToken: string },
+    @Req() req: JwtRequest,
+  ) {
     return this.authService.refresh(
       body.refreshToken,
       req.headers['user-agent'] || 'unknown',
@@ -104,13 +110,13 @@ export class AuthController {
 
   @Post('logout-all')
   @UseGuards(AuthGuard('jwt'))
-  async logoutAll(@Req() req: any) {
+  async logoutAll(@Req() req: JwtRequest) {
     return this.authService.logoutAll(req.user.sub);
   }
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
-  async me(@Req() req: any) {
-    return await req.user;
+  me(@Req() req: JwtRequest) {
+    return req.user;
   }
 }

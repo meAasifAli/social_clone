@@ -7,25 +7,39 @@ import {
   UseGuards,
   Req,
   Post,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FollowUserDto } from './dto/follow-user.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtRequest } from '../types/jwt-request.type';
 
 @Controller('users')
 @UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 
+  @Get('suggestions')
+  @UseGuards(AuthGuard('jwt'))
+  getSuggestions(@Req() req: JwtRequest) {
+    return this.usersService.getSuggestions(req.user.sub);
+  }
   @Get(':id')
-  getById(@Param('id') id: string) {
-    return this.usersService.getById(id);
+  getById(@Req() req: JwtRequest, @Param('id') id: string) {
+    return this.usersService.getById(id, req.user.sub);
   }
 
   @Patch('me')
-  updateMe(@Req() req: any, @Body() dto: UpdateUserDto) {
-    return this.usersService.updateProfile(req.user.sub, dto);
+  @UseInterceptors(FileInterceptor('avatar')) // 'avatar' should match the field name in FormData
+  updateMe(
+    @Req() req: JwtRequest,
+    @Body() dto: UpdateUserDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.usersService.updateProfile(req.user.sub, dto, file);
   }
 
   @Post('follow')
