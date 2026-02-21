@@ -4,6 +4,7 @@ export enum NotificationType {
   FOLLOW = 'follow',
   REPOST = 'repost',
   MENTION = 'mention',
+  MESSAGE = 'message',
 }
 
 export interface BaseNotification {
@@ -40,7 +41,16 @@ export interface FollowNotification extends BaseNotification {
   data: Record<string, never>;
 }
 
+export interface MessageNotification extends BaseNotification {
+  type: NotificationType.MESSAGE;
+  data: {
+    messageContent: string;
+    conversationId: string;
+  };
+}
+
 export type Notification =
   | LikeNotification
   | CommentNotification
-  | FollowNotification;
+  | FollowNotification
+  | MessageNotification;

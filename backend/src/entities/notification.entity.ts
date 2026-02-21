@@ -14,6 +14,7 @@ export enum NotificationType {
   FOLLOW = 'follow',
   REPOST = 'repost',
   MENTION = 'mention',
+  MESSAGE = 'message',
 }
 
 @Entity('notifications')
@@ -56,6 +57,8 @@ export class Notification {
     postContent?: string;
     commentId?: string;
     commentContent?: string;
+    messageContent?: string;
+    conversationId?: string;
   };
 
   @CreateDateColumn()

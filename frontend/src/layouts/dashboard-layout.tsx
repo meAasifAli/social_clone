@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { useGetSuggestionsQuery } from "@/store/apis/user-api";
@@ -210,8 +211,11 @@ const SuggestionsPanel = () => {
 
 const DashboardLayout = () => {
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const { accessToken, user } = useAppSelector((state) => state.auth);
   const { isConnected } = useAppSelector((state) => state.notifications);
+
+  const isMessagesRoute = location.pathname.includes("/dashboard/messages");
 
   useEffect(() => {
     if (!accessToken || !user) return;
@@ -257,20 +261,24 @@ const DashboardLayout = () => {
             </div>
           </DashboardHeader>
 
-          {/* Scrollable Feed Area */}
-          <main className="flex-1 overflow-y-auto">
-            <div className="max-w-2xl mx-auto px-4 py-6">
+          <main className={cn("flex-1 overflow-hidden bg-muted/20", !isMessagesRoute && "overflow-y-auto")}>
+            <div className={cn(
+              "mx-auto h-full w-full",
+              !isMessagesRoute ? "max-w-3xl px-4 pt-6 pb-20" : "max-w-full p-0 sm:p-4"
+            )}>
               <Outlet />
             </div>
           </main>
         </SidebarInset>
 
         {/* Right Panel - Suggestions */}
-        <aside className="hidden lg:block w-96 border-l overflow-y-auto">
-          <div className="p-6">
-            <SuggestionsPanel />
-          </div>
-        </aside>
+        {!isMessagesRoute && (
+          <aside className="hidden lg:block w-[22rem] border-l border-border/40 bg-card/30 overflow-y-auto shrink-0 shadow-sm z-10">
+            <div className="p-6 sticky top-0">
+              <SuggestionsPanel />
+            </div>
+          </aside>
+        )}
       </div>
     </SidebarProvider>
   );

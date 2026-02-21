@@ -242,7 +242,7 @@ export const PostCard = ({ post }: PostCardProps) => {
   return (
     <>
       {/* ---------------- FEED CARD ---------------- */}
-      <Card className="overflow-hidden border bg-background shadow-sm">
+      <Card className="overflow-hidden border border-border/50 bg-card shadow-sm hover:shadow-md transition-shadow duration-300 rounded-xl">
         <CardContent className="p-0">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3">
@@ -342,8 +342,8 @@ export const PostCard = ({ post }: PostCardProps) => {
                 >
                   <Heart
                     className={cn(
-                      "h-6 w-6",
-                      liked && "fill-red-500 text-red-500",
+                      "h-6 w-6 transition-all duration-300",
+                      liked ? "fill-primary text-primary scale-110" : "hover:text-primary",
                     )}
                   />
                 </button>
@@ -385,22 +385,27 @@ export const PostCard = ({ post }: PostCardProps) => {
 
       {/* ---------------- COMMENTS DIALOG ---------------- */}
       <Dialog open={commentsOpen} onOpenChange={setCommentsOpen}>
-        <DialogContent className="max-w-5xl w-[95vw] p-0 overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-2">
+        <DialogContent 
+          className={cn(
+            "w-[95vw] p-0 overflow-hidden",
+            post.image ? "sm:max-w-6xl" : "sm:max-w-3xl"
+          )}
+        >
+          <div className={cn("grid grid-cols-1", post.image && "md:grid-cols-[1.3fr_1fr]")}>
             {/* Left: Image */}
             {post.image && (
               <div className="bg-black flex items-center justify-center h-[80vh]">
                 <img
                   src={post.image}
                   alt="post"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                 />
               </div>
             )}
 
             {/* Right: Comments */}
             <div className="flex flex-col h-[80vh] bg-background">
-              <DialogHeader className="border-b px-4 py-3">
+              <DialogHeader className="border-b pl-4 pr-12 py-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <button

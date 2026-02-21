@@ -14,6 +14,7 @@ import Search from "./pages/dashboard/search";
 import Activity from "./pages/dashboard/activity";
 import Feed from "./pages/dashboard/feed";
 import Settings from "./pages/dashboard/settings";
+import Messages from "./pages/dashboard/messages";
 import { PublicRoute } from "./pages/general/public-route";
 import { ProtectedRoute } from "./pages/general/protected-route";
 import GoogleSuccess from "./pages/auth/google-success";
@@ -47,6 +48,7 @@ const App = () => {
           <Route path="create" element={<CreatePosts />} />
           <Route path="search" element={<Search />} />
           <Route path="activity" element={<Activity />} />
+          <Route path="messages" element={<Messages />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Route>

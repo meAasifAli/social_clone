@@ -47,6 +47,10 @@ export const userApi = baseApi.injectEndpoints({
       query: () => `/users/suggestions`,
       providesTags: [{ type: "User", id: "SUGGESTIONS" }],
     }),
+    getAllUsers: builder.query<User[], void>({
+      query: () => `/users`,
+      providesTags: [{ type: "User", id: "ALL" }],
+    }),
   }),
 
   overrideExisting: false,
@@ -58,4 +62,5 @@ export const {
   useFollowUserMutation,
   useUnfollowUserMutation,
   useGetSuggestionsQuery,
+  useGetAllUsersQuery,
 } = userApi;

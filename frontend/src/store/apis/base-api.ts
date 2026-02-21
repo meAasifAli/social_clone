@@ -16,6 +16,6 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Post", "Comment", "User", "Notifications", "UnreadCount"], // ✅ global tagTypes
+  tagTypes: ["Post", "Comment", "User", "Notifications", "UnreadCount", "Conversation", "Message"], // ✅ global tagTypes
   endpoints: () => ({}),
 });

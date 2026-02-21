@@ -33,13 +33,15 @@ import { cn } from "@/lib/utils";
 const getNotificationIcon = (type: string) => {
   switch (type) {
     case "like":
-      return <Heart className="h-4 w-4 text-red-500" />;
+      return <Heart className="h-4 w-4 text-primary" />;
     case "comment":
       return <MessageCircle className="h-4 w-4 text-blue-500" />;
     case "follow":
       return <UserPlus className="h-4 w-4 text-green-500" />;
     case "repost":
       return <Repeat className="h-4 w-4 text-purple-500" />;
+    case "message":
+      return <MessageCircle className="h-4 w-4 text-primary" />;
     default:
       return <Bell className="h-4 w-4" />;
   }
@@ -57,6 +59,8 @@ const getNotificationText = (notification: any) => {
       return `${actorName} started following you`;
     case "repost":
       return `${actorName} reposted your post`;
+    case "message":
+      return `${actorName} sent you a message: "${notification.data?.messageContent || ""}"`;
     default:
       return `New notification from ${actorName}`;
   }
@@ -96,6 +100,8 @@ export const NotificationDropdown = () => {
       }
     } else if (notification.type === "follow") {
       navigate(`/dashboard/profile/${notification.actor?.id}`);
+    } else if (notification.type === "message") {
+      navigate(`/dashboard/messages?userId=${notification.actor?.id}`);
     }
 
     setOpen(false);
@@ -107,7 +113,7 @@ export const NotificationDropdown = () => {
   };
 
   const handleViewAll = () => {
-    navigate("/dashboard/notifications");
+    navigate("/dashboard/activity");
     setOpen(false);
   };
 

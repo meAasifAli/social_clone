@@ -4,84 +4,41 @@ interface LogoIconProps {
 
 export const LogoIcon = ({ className }: LogoIconProps) => (
   <svg
-    viewBox="0 0 24 24"
+    viewBox="0 0 100 100"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
   >
-    {/* Gradient Definitions */}
     <defs>
-      <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#3B82F6" />
-        <stop offset="50%" stopColor="#8B5CF6" />
-        <stop offset="100%" stopColor="#EC4899" />
+      <linearGradient id="orbit-grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#0ea5e9" /> {/* Sky 500 */}
+        <stop offset="100%" stopColor="#6366f1" /> {/* Indigo 500 */}
       </linearGradient>
-      <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.2" />
-        <stop offset="50%" stopColor="#8B5CF6" stopOpacity="0.2" />
-        <stop offset="100%" stopColor="#EC4899" stopOpacity="0.2" />
+      <linearGradient id="orbit-grad2" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#8b5cf6" /> {/* Violet 500 */}
+        <stop offset="100%" stopColor="#ec4899" /> {/* Pink 500 */}
       </linearGradient>
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-        <feMerge>
-          <feMergeNode in="coloredBlur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
+      <filter id="soft-glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
     </defs>
 
-    {/* Background Glow */}
-    <circle
-      cx="12"
-      cy="12"
-      r="10"
-      fill="url(#glowGradient)"
-      filter="url(#glow)"
-    />
+    <g filter="url(#soft-glow)">
+      {/* Outer Orbit */}
+      <circle cx="50" cy="50" r="38" stroke="url(#orbit-grad1)" strokeWidth="8" fill="none" opacity="0.9" strokeLinecap="round" strokeDasharray="180 60" />
+      
+      {/* Inner Orbit */}
+      <circle cx="50" cy="50" r="22" stroke="url(#orbit-grad2)" strokeWidth="8" fill="none" opacity="0.8" strokeLinecap="round" strokeDasharray="80 30" transform="rotate(45 50 50)" />
+      
+      {/* Core Node */}
+      <circle cx="50" cy="50" r="10" fill="url(#orbit-grad1)" />
 
-    {/* Main Chat Bubble */}
-    <path
-      d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22H17C19.76 22 22 19.76 22 17V12C22 6.48 17.52 2 12 2Z"
-      fill="url(#logoGradient)"
-      stroke="white"
-      strokeWidth="0.5"
-      strokeOpacity="0.3"
-    />
-
-    {/* Inner Chat Lines */}
-    <path
-      d="M8 9H16M8 13H14M8 17H12"
-      stroke="white"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeOpacity="0.9"
-    />
-
-    {/* Floating Dots Animation */}
-    <circle cx="18" cy="8" r="1" fill="white" fillOpacity="0.8">
-      <animate
-        attributeName="r"
-        values="1;1.5;1"
-        dur="2s"
-        repeatCount="indefinite"
-      />
-    </circle>
-    <circle cx="20" cy="12" r="1" fill="white" fillOpacity="0.6">
-      <animate
-        attributeName="r"
-        values="1;1.3;1"
-        dur="2.2s"
-        repeatCount="indefinite"
-      />
-    </circle>
-    <circle cx="18" cy="16" r="1" fill="white" fillOpacity="0.4">
-      <animate
-        attributeName="r"
-        values="1;1.1;1"
-        dur="1.8s"
-        repeatCount="indefinite"
-      />
-    </circle>
+      {/* Floating Connection Points */}
+      <circle cx="85" cy="30" r="6" fill="url(#orbit-grad2)" />
+      <circle cx="15" cy="70" r="6" fill="#0ea5e9" />
+      <circle cx="20" cy="20" r="4" fill="#ec4899" opacity="0.8" />
+      <circle cx="80" cy="80" r="4" fill="#8b5cf6" opacity="0.8" />
+    </g>
   </svg>
 );

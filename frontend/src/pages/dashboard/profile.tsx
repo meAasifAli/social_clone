@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { Grid, Camera, X, UserPlus, UserCheck } from "lucide-react";
+import { Grid, Camera, X, UserPlus, UserCheck, } from "lucide-react";
 import { toast } from "sonner";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Heart, MessageCircle } from "lucide-react";
 
 import { useAppSelector } from "@/store/hooks";
 import {
@@ -68,6 +68,7 @@ const ProfileSkeleton = () => (
 /* ---------------- Component ---------------- */
 
 const Profile = () => {
+  const navigate = useNavigate();
   const { userId: profileUserId } = useParams<{ userId: string }>();
   const authUser = useAppSelector((s) => s.auth.user);
   const currentUserId = authUser?.id;
@@ -592,30 +593,39 @@ const Profile = () => {
       {/* Tabs */}
       <div className="flex justify-center gap-2 border-t pt-4">
         <Grid className="h-5 w-5" />
-        <span className="text-sm font-medium">Posts</span>
+        <span className="text-sm font-semibold tracking-widest uppercase">Posts</span>
       </div>
 
       {/* Posts Grid */}
       <div className="grid grid-cols-3 gap-1 md:gap-4">
         {postsLoading ? (
-          <div className="col-span-3 text-center py-8 text-muted-foreground">
+          <div className="col-span-3 text-center py-12 text-muted-foreground">
             Loading posts...
           </div>
         ) : postsData?.data?.length ? (
           postsData.data.map((post) => (
-            <Card key={post.id} className="aspect-square overflow-hidden">
-              {post.image ? (
-                <img
-                  src={post.image}
-                  alt="post"
-                  className="h-full w-full object-cover transition hover:scale-105"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
-                  No image
+            <div 
+              key={post.id} 
+              className="group relative aspect-square overflow-hidden bg-muted cursor-pointer rounded-sm md:rounded-md"
+              onClick={() => navigate(`/dashboard/post/${post.id}`)}
+            >
+              <img
+                src={post.image || ""}
+                alt="post"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-6 text-white font-semibold">
+                <div className="flex items-center gap-2">
+                  <Heart className="h-6 w-6 fill-white" />
+                  <span>{post.likeCount || 0}</span>
                 </div>
-              )}
-            </Card>
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-6 w-6 fill-white" />
+                  <span>{post.commentCount || 0}</span>
+                </div>
+              </div>
+            </div>
           ))
         ) : (
           <div className="col-span-3 text-center py-8 text-muted-foreground">

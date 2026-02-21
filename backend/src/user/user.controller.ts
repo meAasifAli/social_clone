@@ -27,6 +27,12 @@ export class UserController {
   getSuggestions(@Req() req: JwtRequest) {
     return this.usersService.getSuggestions(req.user.sub);
   }
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  getAll(@Req() req: JwtRequest) {
+    return this.usersService.getAll(req.user.sub);
+  }
+
   @Get(':id')
   getById(@Req() req: JwtRequest, @Param('id') id: string) {
     return this.usersService.getById(id, req.user.sub);

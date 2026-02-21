@@ -138,6 +138,10 @@ function setupListeners() {
       case "repost":
         toast.success(`${actorName} reposted your post`);
         break;
+      case "message":
+        const messageText = data.data?.messageContent || "";
+        toast.success(`${actorName} sent you a message: ${messageText}`);
+        break;
       default:
         toast.success(`New notification from ${actorName}`);
     }

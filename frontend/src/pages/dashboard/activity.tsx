@@ -31,6 +31,7 @@ const iconMap = {
   follow: UserPlus,
   repost: Repeat,
   mention: Bell,
+  message: MessageCircle,
 };
 
 const Activity = () => {
@@ -72,6 +73,9 @@ const Activity = () => {
       case "follow":
         navigate(`/dashboard/profile/${notification.actor?.id}`);
         break;
+      case "message":
+        navigate(`/dashboard/messages?userId=${notification.actor?.id}`);
+        break;
     }
   };
 
@@ -98,6 +102,8 @@ const Activity = () => {
         return `${actorName} reposted your post`;
       case "mention":
         return `${actorName} mentioned you`;
+      case "message":
+        return `${actorName} sent you a message: "${notification.data?.messageContent || ""}"`;
       default:
         return `New notification from ${actorName}`;
     }
@@ -141,7 +147,7 @@ const Activity = () => {
             className="mt-2"
             onValueChange={setActiveTab}
           >
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6 h-auto p-1">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="like" className="gap-1">
                 <Heart className="h-3.5 w-3.5" />
@@ -150,6 +156,10 @@ const Activity = () => {
               <TabsTrigger value="comment" className="gap-1">
                 <MessageCircle className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Comments</span>
+              </TabsTrigger>
+              <TabsTrigger value="message" className="gap-1">
+                <MessageCircle className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Messages</span>
               </TabsTrigger>
               <TabsTrigger value="follow" className="gap-1">
                 <UserPlus className="h-3.5 w-3.5" />
@@ -226,7 +236,7 @@ const Activity = () => {
                           </div>
                         </div>
 
-                        <Icon className="h-4 w-4 text-muted-foreground mt-1" />
+                        <Icon className={cn("h-4 w-4 mt-1", notification.type === "like" ? "text-primary" : "text-muted-foreground")} />
                       </div>
                     );
                   })

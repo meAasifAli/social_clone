@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { PostCard } from "@/components/feed/post-card";
-import { useGetFeedQuery } from "@/store/apis/post-api";
+import { type Post, useGetFeedQuery } from "@/store/apis/post-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -62,6 +62,7 @@ const LoadingFeed = () => {
 
 const Feed = () => {
   const [page, setPage] = useState(1);
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
   const limit = 5; // Posts per page
 
   const { data, isLoading, isError, isFetching } = useGetFeedQuery({
@@ -69,8 +70,18 @@ const Feed = () => {
     offset: (page - 1) * limit,
   });
 
-  // Derive state from data instead of storing in useState
-  const allPosts = data?.data || [];
+  // Accumulate posts when new data arrives
+  useEffect(() => {
+    if (data?.data) {
+      setAllPosts((prev) => {
+        // Only append new posts that aren't already in the list
+        const existingIds = new Set(prev.map(p => p.id));
+        const newPosts = data.data.filter(p => !existingIds.has(p.id));
+        return [...prev, ...newPosts];
+      });
+    }
+  }, [data]);
+
   const hasMore = data?.data?.length === limit;
   const isFetchingMore = isFetching && page > 1;
 

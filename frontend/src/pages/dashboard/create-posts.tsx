@@ -3,10 +3,11 @@ import { z } from "zod";
 import { ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 import { useCreatePostMutation } from "@/store/apis/post-api";
 import { useAppSelector } from "@/store/hooks";
@@ -117,18 +118,19 @@ const CreatePosts = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create new post</CardTitle>
+    <div className="max-w-2xl mx-auto p-2 sm:p-4">
+      <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-xl overflow-hidden bg-card/60 backdrop-blur supports-[backdrop-filter]:bg-card/40">
+        <CardHeader className="border-b border-border/40 bg-muted/20 pb-4">
+          <CardTitle className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">Create new post</CardTitle>
+          <CardDescription>Share a photo and your thoughts with your connections.</CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           {/* User */}
           <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={avatarUrl} />
-              <AvatarFallback>{avatarFallback}</AvatarFallback>
+            <Avatar className="h-11 w-11 ring-2 ring-primary/10">
+              <AvatarImage src={avatarUrl} className="object-cover" />
+              <AvatarFallback className="bg-primary/10 text-primary font-medium">{avatarFallback}</AvatarFallback>
             </Avatar>
 
             <div className="flex flex-col leading-tight">
@@ -147,23 +149,30 @@ const CreatePosts = () => {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex h-64 w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed text-muted-foreground hover:bg-muted transition"
+              className="group flex h-72 w-full flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-border/60 bg-muted/10 text-muted-foreground hover:bg-muted/30 hover:border-primary/50 transition-all duration-300"
             >
-              <ImagePlus className="h-8 w-8" />
-              <span>Select an image</span>
+              <div className="h-16 w-16 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <ImagePlus className="h-8 w-8" />
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <span className="font-semibold text-foreground">Click to upload an image</span>
+                <span className="text-xs">SVG, PNG, JPG or GIF (max. 5MB)</span>
+              </div>
             </button>
           ) : (
-            <div className="relative">
+            <div className="relative group rounded-xl overflow-hidden border border-border/40 shadow-sm bg-black/5 flex justify-center">
               <img
                 src={imagePreview}
                 alt="preview"
-                className="w-full rounded-md object-cover"
+                className="w-full max-h-[500px] object-contain rounded-xl"
               />
+              
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none" />
 
               <button
                 type="button"
                 onClick={clearImage}
-                className="absolute right-2 top-2 rounded-full bg-black/60 p-1 text-white"
+                className="absolute right-3 top-3 rounded-full bg-black/60 p-2 text-white hover:bg-red-500/90 transition-colors shadow-sm opacity-0 group-hover:opacity-100"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -184,25 +193,34 @@ const CreatePosts = () => {
           {/* Caption */}
           <div className="space-y-2">
             <Textarea
-              placeholder="Write a caption..."
+              placeholder="What's on your mind? Write a compelling caption..."
               value={caption}
               maxLength={MAX_CAPTION_LENGTH}
               onChange={(e) => setCaption(e.target.value)}
               rows={4}
+              className="resize-none rounded-xl bg-muted/20 border-border/50 focus-visible:ring-primary/30 text-base"
             />
 
-            <div className="text-right text-xs text-muted-foreground">
-              {caption.length}/{MAX_CAPTION_LENGTH}
+            <div className="flex justify-between items-center px-1">
+              <span className="text-xs text-muted-foreground">
+                Make it count
+              </span>
+              <span className="text-xs font-medium text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+                {caption.length}/{MAX_CAPTION_LENGTH}
+              </span>
             </div>
           </div>
+          
+          <Separator className="bg-border/40" />
 
           {/* Actions */}
-          <div className="flex justify-end">
+          <div className="flex justify-end pt-2">
             <Button
               onClick={handleSubmit}
               disabled={!imageFile || caption.trim().length === 0 || isLoading}
+              className="rounded-full px-8 py-5 shadow-sm hover:shadow-md transition-all duration-300 font-semibold text-sm"
             >
-              {isLoading ? "Publishing..." : "Publish"}
+              {isLoading ? "Publishing..." : "Publish Post"}
             </Button>
           </div>
         </CardContent>

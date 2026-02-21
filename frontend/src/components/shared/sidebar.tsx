@@ -7,6 +7,7 @@ import {
   User,
   Settings,
   LogOut,
+  MessageCircle,
 } from "lucide-react";
 
 import Logo from "@/components/shared/logo";
@@ -33,6 +34,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout as logoutAction } from "@/store/slices/auth.slice";
 import { useLogoutMutation } from "@/store/apis/auth-api";
 import { useGetUserByIdQuery } from "@/store/apis/user-api";
+import { useGetConversationsQuery, useSyncOnlineUsersQuery } from "@/store/apis/message-api";
 
 /* ---------------- Navigation ---------------- */
 
@@ -40,11 +42,12 @@ const navItems = [
   { label: "Feed", icon: Home, to: "/dashboard/feed" },
   { label: "Search", icon: Search, to: "/dashboard/search" },
   { label: "Create", icon: PlusSquare, to: "/dashboard/create" },
+  { label: "Messages", icon: MessageCircle, to: "/dashboard/messages" },
   { label: "Activity", icon: Heart, to: "/dashboard/activity" },
   { label: "Profile", icon: User, to: "/dashboard/profile" },
 ];
 
-const FILLED_ICONS = ["Home", "Activity", "Profile"];
+const FILLED_ICONS = ["Home", "Activity", "Profile", "Messages"];
 
 /* ---------------- Helper ---------------- */
 
@@ -69,6 +72,13 @@ export const DashboardSidebar = () => {
   const { data: user } = useGetUserByIdQuery(userId!, {
     skip: !userId,
   });
+
+  const { data: conversations } = useGetConversationsQuery(undefined, { skip: !userId });
+  useSyncOnlineUsersQuery(undefined, { skip: !userId });
+
+  const unreadMessagesCount = Array.isArray(conversations) 
+    ? conversations.reduce((acc, c) => acc + (c.unreadCount || 0), 0) 
+    : 0;
 
   const displayName =
     user?.fullName ||
@@ -110,19 +120,24 @@ export const DashboardSidebar = () => {
                 to={itemTo}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center rounded-md px-3 py-2 text-sm transition-all",
-                    "hover:bg-muted",
-                    isActive && "bg-muted font-semibold",
+                    "group relative flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    "hover:bg-accent/50 hover:text-accent-foreground",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground",
                     collapsed ? "justify-center px-2" : "gap-3",
                   )
                 }
               >
                 {({ isActive }) => (
                   <>
+                    {isActive && !collapsed && (
+                      <div className="absolute left-0 top-1/2 -mt-4 h-8 w-1 rounded-r-full bg-primary" />
+                    )}
                     <Icon
                       className={cn(
-                        "h-5 w-5 shrink-0 transition",
-                        isActive && "scale-105",
+                        "h-5 w-5 shrink-0 transition-transform duration-200",
+                        isActive ? "scale-110 text-primary" : "group-hover:scale-110 group-hover:text-foreground",
                       )}
                       {...(isActive && FILLED_ICONS.includes(item.label)
                         ? { fill: "currentColor", stroke: "none" }
@@ -132,11 +147,24 @@ export const DashboardSidebar = () => {
                     {!collapsed && (
                       <span
                         className={cn(
-                          "transition",
-                          isActive && "font-semibold",
+                          "transition-colors",
+                          isActive ? "font-semibold bg-gradient-to-br from-primary to-primary/70 bg-clip-text text-transparent" : "",
                         )}
                       >
                         {item.label}
+                      </span>
+                    )}
+                    
+                    {item.label === "Messages" && unreadMessagesCount > 0 && (
+                      <span
+                        className={cn(
+                          "absolute flex items-center justify-center rounded-full bg-primary font-medium text-primary-foreground",
+                          collapsed 
+                            ? "top-1 right-1 h-4 w-4 text-[9px]" 
+                            : "right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[10px]"
+                        )}
+                      >
+                        {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
                       </span>
                     )}
                   </>

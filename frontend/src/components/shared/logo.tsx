@@ -1,4 +1,4 @@
-import { MessageCircle } from "lucide-react";
+import { LogoIcon } from "./logo-icon";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -35,15 +35,8 @@ const Logo = ({ size = "md", showText = true }: LogoProps) => {
   return (
     <div className="flex items-center gap-2">
       {/* Logo Icon */}
-      <div
-        className={cn(
-          "rounded-xl bg-linear-to-br from-blue-500 to-blue-700",
-          "flex items-center justify-center text-white",
-          "shadow-lg shadow-blue-500/20",
-          sizes.container,
-        )}
-      >
-        <MessageCircle className={sizes.icon} />
+      <div className={cn("shrink-0", sizes.container)}>
+        <LogoIcon className="w-full h-full drop-shadow-md" />
       </div>
 
       {/* Logo Text - Two lines */}
@@ -51,8 +44,8 @@ const Logo = ({ size = "md", showText = true }: LogoProps) => {
         <div className="flex flex-col leading-tight">
           <span
             className={cn(
-              "bg-linear-to-br from-blue-600 to-blue-800 bg-clip-text text-transparent",
-              "font-bold",
+              "bg-linear-to-br from-sky-500 to-indigo-600 bg-clip-text text-transparent drop-shadow-sm",
+              "font-extrabold tracking-tight",
               sizes.text,
             )}
           >
@@ -60,18 +53,18 @@ const Logo = ({ size = "md", showText = true }: LogoProps) => {
           </span>
           <span
             className={cn(
-              "bg-linear-to-br from-blue-500 to-blue-700 bg-clip-text text-transparent",
-              "font-medium -mt-1",
+              "bg-linear-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent drop-shadow-sm",
+              "font-bold tracking-widest uppercase -mt-1",
               size === "sm"
-                ? "text-[10px]"
+                ? "text-[8px]"
                 : size === "md"
-                  ? "text-xs"
+                  ? "text-[9px]"
                   : size === "lg"
-                    ? "text-sm"
-                    : "text-base",
+                    ? "text-[11px]"
+                    : "text-xs",
             )}
           >
-            connected
+            Connected
           </span>
         </div>
       )}

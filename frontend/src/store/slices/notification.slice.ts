@@ -2,7 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface Notification {
   id: string;
-  type: "like" | "comment" | "follow" | "repost" | "mention";
+  type: "like" | "comment" | "follow" | "repost" | "mention" | "message";
   actor: {
     id: string;
     name: string;
@@ -13,6 +13,8 @@ export interface Notification {
     postContent?: string;
     commentId?: string;
     commentContent?: string;
+    messageContent?: string;
+    conversationId?: string;
   };
   read: boolean;
   createdAt: string;

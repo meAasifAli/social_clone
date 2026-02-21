@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 
 import { User } from '../entities/user.entity';
 import { Follow } from '../entities/follow.entity';
@@ -278,5 +278,13 @@ export class UserService {
       bio: s.user_bio,
       mutualFollowersCount: parseInt(s.mutualFollowersCount) || 0,
     }));
+  }
+  async getAll(currentUserId: string): Promise<User[]> {
+    return this.userRepo.find({
+      where: { id: Not(currentUserId) },
+      select: ['id', 'email', 'username', 'fullName', 'avatar', 'bio'],
+      take: 50,
+      order: { createdAt: 'DESC' }
+    });
   }
 }

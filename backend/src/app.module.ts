@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { NotificationModule } from './notifications/notifications.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { NotificationModule } from './notifications/notifications.module';
     NotificationModule,
     UserModule,
     PostModule,
+    MessagesModule,
   ],
   controllers: [],
   providers: [],
